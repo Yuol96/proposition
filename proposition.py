@@ -100,7 +100,8 @@ class PropositionLogic:
 				lst.append(self(**kwargs))
 			if self.formulaStr in dct:
 				dct["output"] = lst
-			dct[self.formulaStr] = lst
+			# dct[self.formulaStr] = lst
+			dct["output"] = lst
 			return dct
 
 	def clearAllProposition(self):
@@ -245,6 +246,7 @@ if __name__ == '__main__':
 	from http.server import BaseHTTPRequestHandler, HTTPServer
 	import os
 	import urllib
+	import json
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-f','--formula',type=str,default='(p->q)&(!p->q)')
@@ -265,10 +267,12 @@ if __name__ == '__main__':
 					print(formulaStr)
 					try:
 						dct = os.popen("python3 proposition.py -f='{}'".format(formulaStr)).read()
+						dct = eval(dct)
 						self.send_response(200)
 						self.send_header('Content-type','text/html')
+						self.send_header("Access-Control-Allow-Origin", "*")
 						self.end_headers()
-						self.wfile.write(dct.encode())
+						self.wfile.write(json.dumps(dct).encode())
 					except Exception as e:
 						self.send_error(500, str(e))
 				else:

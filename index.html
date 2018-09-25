@@ -21,14 +21,18 @@
         <button type="submit" class="btn btn-primary" ng-click="pl.submit()">Submit</button>
         <div class="error" ng-if="pl.errorMsg">{{pl.errorMsg}}</div>
       </form>
-      <!-- <table class="table">
+      <table class="table" ng-if="pl.TF">
         <thead>
           <th scope="col">#</th>
-          <th scope="col">First</th>
-          <th scope="col">Last</th>
-          <th scope="col">Handle</th>
+          <th scope="col" ng-repeat="colName in pl.heads">{{colName}}</th>
         </thead>
-      </table> -->
+        <tbody>
+          <tr ng-repeat="dct in pl.row">
+            <th scope="row">{{$index}}</th>
+            <th scope="row" ng-repeat="colName in pl.heads">{{dct[colName]}}</th>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- Optional JavaScript -->

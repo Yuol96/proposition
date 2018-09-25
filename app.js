@@ -16,7 +16,23 @@ function propositionLogic(requestService){
 		var promise = requestService.getTF(pl.formulaStr);
 		promise.then(function(response){
 			pl.errorMsg = "";
-			pl.TF = Json.parse(response.data);
+			pl.TF = response.data;
+			pl.heads = [];
+			pl.row = [];
+			for(var colName in pl.TF){
+				if(colName!=="output")
+					pl.heads.push(colName);
+			}
+			pl.heads.push('output');
+			for(var idx in pl.TF.output){
+				var dct = {};
+				for(var colName in pl.TF) {
+					dct[colName] = pl.TF[colName][idx];
+				}
+				pl.row.push(dct);
+			}
+			// console.log(pl.heads);
+			// console.log(pl.row);
 			console.log(pl.TF);
 		}).catch(function(error){
 			pl.errorMsg = error;
@@ -40,7 +56,6 @@ function requestService($http,baseURL){
 				"formula": formulaStr
 			}
 		});
-		console.log(baseURL+"formula="+formulaStr);
 		return response;
 	};
 }
