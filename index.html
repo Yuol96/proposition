@@ -11,12 +11,12 @@
     <title>Discrete Math</title>
   </head>
   <body>
-    <h1>Truth Function Calculator</h1>
     <div class="container" ng-controller="propositionLogic as pl">
+      <h1>Truth Function Calculator</h1>
       <form>
         <div class="form-group">
           <label for="exampleInputPassword1">Formula</label>
-          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Please input your formula here" ng-model=pl.formulaStr>
+          <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Please input your formula here" ng-model=pl.formulaStr>
         </div>
         <button type="submit" class="btn btn-primary" ng-click="pl.submit()">Submit</button>
         <div class="error" ng-if="pl.errorMsg">{{pl.errorMsg}}</div>
