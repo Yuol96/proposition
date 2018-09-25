@@ -190,7 +190,8 @@ class PropositionLogic:
 		for token in postExprList:
 			rank = self.rankChar(token)
 			if rank == 0:
-				name2proposition[token] = Proposition(token)
+				if token not in name2proposition:
+					name2proposition[token] = Proposition(token)
 				stack.append(name2proposition[token])
 			else :
 				if token == '!':
@@ -236,11 +237,13 @@ def test_transformFormula():
 if __name__ == '__main__':
 	import argparse
 	from pprint import pprint
+	from IPython import embed
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-f','--formula',type=str,default='!( p -> (q & r) )')
+	parser.add_argument('-f','--formula',type=str,default='(p->q)&(!p->q)')
 	args = parser.parse_args()
 
 	p = PropositionLogic(args.formula)
+	embed()
 
 	pprint(p.getTruethFunction(pandas=True))
