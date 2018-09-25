@@ -4,7 +4,7 @@
 angular.module("dmathAPP",[])
 .controller('propositionLogic',propositionLogic)
 .service('requestService', requestService)
-.constant('baseURL','188.131.137.105:8085');
+.constant('baseURL','188.131.137.105:8085/');
 
 propositionLogic.$inject = ['requestService']
 function propositionLogic(requestService){
@@ -34,7 +34,10 @@ function requestService($http,baseURL){
 	service.getTF = function(formulaStr) {
 		var response = $http({
 			method: "GET",
-			url: (baseURL + '/formula=' + formulaStr)
+			url: baseURL,
+			params: {
+				formula: formulaStr
+			}
 		});
 		return response;
 	};
