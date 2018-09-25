@@ -87,6 +87,8 @@ class PropositionLogic:
 			df = pd.DataFrame(dct)
 			def compute(row):
 				kwargs = row.to_dict()
+				if self.formulaStr in row:
+					row["output"] = self(**kwargs)
 				row[self.formulaStr] = self(**kwargs)
 				return row
 			df = df.apply(compute, axis=1)
@@ -96,6 +98,8 @@ class PropositionLogic:
 			for idx in range(2**len(allTokens)):
 				kwargs = {token:dct[token][idx] for token in allTokens}
 				lst.append(self(**kwargs))
+			if self.formulaStr in dct:
+				dct["output"] = lst
 			dct[self.formulaStr] = lst
 			return dct
 
@@ -238,12 +242,45 @@ if __name__ == '__main__':
 	import argparse
 	from pprint import pprint
 	from IPython import embed
+	from http.server import BaseHTTPRequestHandler, HTTPServer
+	import os
+	import urllib
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-f','--formula',type=str,default='(p->q)&(!p->q)')
+	parser.add_argument('--pandas',default=False, action="store_true")
+	parser.add_argument('-s','--server',default=False, action="store_true")
+	parser.add_argument('--addr',default="0.0.0.0")
+	parser.add_argument('-p','--port',default=8085,type=int)
 	args = parser.parse_args()
 
-	p = PropositionLogic(args.formula)
-	embed()
+	if args.server:
+		class myHandler(BaseHTTPRequestHandler):
+			def do_GET(self):
+				if self.path.startswith('/formula='):
+					# idx = self.path.index('=') + 1
+					# formulaStr = self.path[idx+1:]
+					# print(urllib.parse.parse_qs(self.path.encode()))
+					formulaStr = urllib.parse.parse_qs(self.path.encode())[b'/formula'][0].decode()
+					print(formulaStr)
+					try:
+						dct = os.popen("python3 proposition.py -f='{}'".format(formulaStr)).read()
+						self.send_response(200)
+						self.send_header('Content-type','text/html')
+						self.end_headers()
+						self.wfile.write(dct.encode())
+					except Exception as e:
+						self.send_error(500, str(e))
+				else:
+					self.send_error(404, 'Invalid URL')
 
-	pprint(p.getTruethFunction(pandas=True))
+		server = HTTPServer((args.addr,args.port), myHandler)
+		print("Started HTTP server on port {}".format(args.port))
+
+		server.serve_forever()
+
+	elif args.formula:
+
+		p = PropositionLogic(args.formula)
+
+		print(p.getTruethFunction(pandas=args.pandas))
