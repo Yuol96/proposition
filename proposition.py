@@ -1,4 +1,7 @@
 class Node:
+	"""
+	Basic data structure for the construction of the computing graph of propositional logic expressions.
+	"""
 	def __init__(self, opr, *parents):
 		self.parents = parents
 		self.opr = opr
@@ -23,6 +26,9 @@ class Node:
 		return Node(lambda p,q: p == q, self, node)
 
 class Proposition(Node):
+	"""
+	This is a 'DataProvider', i.e. the placeholder of a logical variable in a propositional logic expression.
+	"""
 	def __init__(self, name,val=None):
 		self._val = val
 		self._name = name
@@ -47,6 +53,9 @@ class Proposition(Node):
 	
 
 class PropositionLogic:
+	"""
+	responsible for parsing input formula and converting it into a computing graph.
+	"""
 	def __init__(self, formulaStr):
 		self.outputNode, self.name2proposition = self.parseFormula(formulaStr)
 		self.formulaStr = formulaStr
@@ -59,6 +68,9 @@ class PropositionLogic:
 		return output
 
 	def getTruethFunction(self):
+		"""
+		The trueth function is stored in a pandas DataFrame and returned.
+		"""
 		dct = {}
 		allTokens = sorted(self.name2proposition.keys())
 		def DFS(dct, tokenList, currList):
@@ -77,7 +89,7 @@ class PropositionLogic:
 			row[self.formulaStr] = self(**kwargs)
 			return row
 		df = df.apply(compute, axis=1)
-		print(df)
+		return df
 
 	def clearAllProposition(self):
 		def DFS(node):
@@ -221,4 +233,4 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	p = PropositionLogic(args.formula)
-	p.getTruethFunction()
+	print(p.getTruethFunction())
