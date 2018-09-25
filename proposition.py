@@ -247,6 +247,7 @@ if __name__ == '__main__':
 	import os
 	import urllib
 	import json
+	import ssl
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-f','--formula',type=str,default='(p->q)&(!p->q)')
@@ -259,6 +260,7 @@ if __name__ == '__main__':
 	if args.server:
 		class myHandler(BaseHTTPRequestHandler):
 			def do_GET(self):
+				print(self.path)
 				if self.path.startswith('/?formula='):
 					# idx = self.path.index('=') + 1
 					# formulaStr = self.path[idx+1:]
@@ -279,6 +281,7 @@ if __name__ == '__main__':
 					self.send_error(404, 'Invalid URL')
 
 		server = HTTPServer((args.addr,args.port), myHandler)
+		server.socket = ssl.wrap_socket (server.socket, certfile='./server.pem', server_side=True)
 		print("Started HTTP server on port {}".format(args.port))
 
 		server.serve_forever()

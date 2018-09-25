@@ -4,7 +4,7 @@
 angular.module("dmathAPP",[])
 .controller('propositionLogic',propositionLogic)
 .service('requestService', requestService)
-.constant('baseURL','http://188.131.137.105:8085/');
+.constant('baseURL','https://188.131.137.105:8085/');
 
 propositionLogic.$inject = ['requestService']
 function propositionLogic(requestService){
