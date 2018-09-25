@@ -57,8 +57,8 @@ class PropositionLogic:
 	responsible for parsing input formula and converting it into a computing graph.
 	"""
 	def __init__(self, formulaStr):
-		self.outputNode, self.name2proposition = self.parseFormula(formulaStr)
-		self.formulaStr = formulaStr
+		self.formulaStr = formulaStr.replace(" ",'')
+		self.outputNode, self.name2proposition = self.parseFormula(self.formulaStr)
 
 	def __call__(self, **kwargs):
 		for varName, value in kwargs.items():
@@ -67,7 +67,7 @@ class PropositionLogic:
 		self.clearAllProposition()
 		return output
 
-	def getTruethFunction(self):
+	def getTruethFunction(self, pandas=True):
 		"""
 		The trueth function is stored in a pandas DataFrame and returned.
 		"""
@@ -82,14 +82,22 @@ class PropositionLogic:
 			DFS(dct, tokenList[1:], currList+[False])
 		DFS(dct, allTokens, [])
 
-		import pandas as pd
-		df = pd.DataFrame(dct)
-		def compute(row):
-			kwargs = row.to_dict()
-			row[self.formulaStr] = self(**kwargs)
-			return row
-		df = df.apply(compute, axis=1)
-		return df
+		if pandas:
+			import pandas as pd
+			df = pd.DataFrame(dct)
+			def compute(row):
+				kwargs = row.to_dict()
+				row[self.formulaStr] = self(**kwargs)
+				return row
+			df = df.apply(compute, axis=1)
+			return df
+		else:
+			lst = []
+			for idx in range(2**len(allTokens)):
+				kwargs = {token:dct[token][idx] for token in allTokens}
+				lst.append(self(**kwargs))
+			dct[self.formulaStr] = lst
+			return dct
 
 	def clearAllProposition(self):
 		def DFS(node):
@@ -151,7 +159,7 @@ class PropositionLogic:
 		import re
 		outputFormula = []
 		stack = []
-		self.varNames = set(re.findall("([a-z_]+)", formulaStr.replace(' ','')))
+		self.varNames = set(re.findall("([a-z_]+)", formulaStr))
 		allTokens = self.getAllToken(formulaStr)
 		for token in allTokens:
 			rank = self.rankChar(token)
@@ -227,10 +235,12 @@ def test_transformFormula():
 
 if __name__ == '__main__':
 	import argparse
+	from pprint import pprint
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument('-f','--formula',type=str,default='!(p->(q&r))')
+	parser.add_argument('-f','--formula',type=str,default='!( p -> (q & r) )')
 	args = parser.parse_args()
 
 	p = PropositionLogic(args.formula)
-	print(p.getTruethFunction())
+
+	pprint(p.getTruethFunction(pandas=True))
