@@ -30,6 +30,7 @@ class Proposition(Node):
 	This is a 'DataProvider', i.e. the placeholder of a logical variable in a propositional logic expression.
 	"""
 	def __init__(self, name,val=None):
+		assert val in [True, False, None]
 		self._val = val
 		self._name = name
 		self.parents = []
@@ -45,6 +46,7 @@ class Proposition(Node):
 
 	@val.setter
 	def val(self, v):
+		assert v in [True, False, None]
 		self._val = v
 
 	@property
