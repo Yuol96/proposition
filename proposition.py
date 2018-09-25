@@ -257,11 +257,11 @@ if __name__ == '__main__':
 	if args.server:
 		class myHandler(BaseHTTPRequestHandler):
 			def do_GET(self):
-				if self.path.startswith('/formula='):
+				if self.path.startswith('/?formula='):
 					# idx = self.path.index('=') + 1
 					# formulaStr = self.path[idx+1:]
 					# print(urllib.parse.parse_qs(self.path.encode()))
-					formulaStr = urllib.parse.parse_qs(self.path.encode())[b'/formula'][0].decode()
+					formulaStr = urllib.parse.parse_qs(self.path.encode())[b'/?formula'][0].decode()
 					print(formulaStr)
 					try:
 						dct = os.popen("python3 proposition.py -f='{}'".format(formulaStr)).read()
